@@ -154,7 +154,7 @@
 (function(){
   var params = new URLSearchParams(location.search);
   var screen = (params.get('screen') || 'tv').toLowerCase();
-  var src = params.get('src') || 'scores.json';
+  var src = params.get('src') || 'https://raw.githubusercontent.com/benmushenFOL/beacon-scores/main/scores.json';
   var refreshMs = parseInt(params.get('refresh') || '5', 10) * 1000;
   var rotateMs = parseInt(params.get('rotate') || '12', 10) * 1000;
 
