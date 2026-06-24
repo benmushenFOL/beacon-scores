@@ -154,8 +154,8 @@
 (function(){
   var params = new URLSearchParams(location.search);
   var screen = (params.get('screen') || 'tv').toLowerCase();
-  var src = params.get('src') || 'https://cdn.statically.io/gh/benmushenFOL/beacon-scores/main/scores.json';
-  var refreshMs = parseInt(params.get('refresh') || '5', 10) * 1000;
+  var src = params.get('src') || 'https://beacon-scores.ben-mushen.workers.dev/';
+  var refreshMs = parseInt(params.get('refresh') || '20', 10) * 1000;
   var rotateMs = parseInt(params.get('rotate') || '12', 10) * 1000;
 
   if(screen === 'totem'){ document.body.classList.add('totem'); }
