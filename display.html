@@ -334,8 +334,25 @@
     var sfL = sf[0] || null, sfR = sf[1] || null;
     var champ = f && f.winner ? f.winner : '';
 
+    // 4-team mode: qualifiers of 4 (or fewer), or no quarter-finals filled in -> semis + final only
+    var qfFilled = qf.some(function(t){ return t && (t.teamA || t.teamB); });
+    var fourTeam = (Number(d.qualifiers) <= 4) || !qfFilled;
+
     var html = '';
-    // butterfly: QF | SF | (champion above final) | SF | QF
+    if(fourTeam){
+      // SF (left) | champion + final (centre) | SF (right)
+      html += '<div class="bfly fourteam">';
+      html += '<div class="bcolb mid"><h3>Semi-final</h3><div class="single">'+tie(sfL)+'<div class="lead lead-l"></div></div></div>';
+      html += '<div class="bcolb centre">'
+            + '<div class="champfloat"><span class="lbl">Champions</span><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div>'
+            + '<h3>Final</h3><div class="single">'+tie(f)+'</div></div>';
+      html += '<div class="bcolb mid"><h3>Semi-final</h3><div class="single"><div class="lead lead-r"></div>'+tie(sfR)+'</div></div>';
+      html += '</div>';
+      main.innerHTML = html;
+      return;
+    }
+
+    // full 8-team butterfly: QF | SF | (champion above final) | SF | QF
     html += '<div class="bfly">';
     html += '<div class="bcolb side"><h3>Quarter-finals</h3>'
           + '<div class="pair">'+tie(qfL[0])+'<div class="brk brk-l"></div>'+tie(qfL[1])+'</div></div>';
@@ -374,6 +391,9 @@
       return '<div class="vfunnel"><svg viewBox="0 0 100 100" preserveAspectRatio="none">'+lines+'</svg></div>';
     }
 
+    var qfFilled = qf.some(function(t){ return t && (t.teamA || t.teamB); });
+    var fourTeam = (Number(d.qualifiers) <= 4) || !qfFilled;
+
     var html = '<div class="vbracket">';
     // Champions
     html += '<div class="vround"><h3>Champions</h3><div class="vrow one"><div class="champcard"><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div></div></div>';
@@ -383,9 +403,11 @@
     html += funnel(2);
     // Semi-finals (2 across)
     html += '<div class="vround"><h3>Semi-finals</h3><div class="vrow">'+(sf[0]?tie(sf[0]):tie())+(sf[1]?tie(sf[1]):tie())+'</div></div>';
-    html += funnel(4);
-    // Quarter-finals (4 across)
-    html += '<div class="vround"><h3>Quarter-finals</h3><div class="vrow qfrow">'+qf.map(tie).join('')+'</div></div>';
+    if(!fourTeam){
+      html += funnel(4);
+      // Quarter-finals (4 across)
+      html += '<div class="vround"><h3>Quarter-finals</h3><div class="vrow qfrow">'+qf.map(tie).join('')+'</div></div>';
+    }
     html += '</div>';
     main.innerHTML = html;
   }
