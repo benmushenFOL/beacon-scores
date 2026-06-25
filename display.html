@@ -136,16 +136,35 @@
   .tie .t .s{font-weight:800;font-variant-numeric:tabular-nums;}
   .tie .t.tbd{color:var(--ink3);font-weight:500;}
 
-  /* Butterfly bracket (landscape TV) */
-  .bfly{display:grid;grid-template-columns:1fr 1fr 1.3fr 1fr 1fr;gap:1.2vw;flex:1 1 auto;align-items:center;padding:0 1vw;}
-  .bcolb{display:flex;flex-direction:column;gap:2.2vh;}
-  .bcolb.side{justify-content:space-around;}
-  .bcolb h3{font-size:0.95vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:0.8vh;}
-  .bcentre{display:flex;flex-direction:column;align-items:center;gap:2.4vh;}
-  .bcentre .tie{width:100%;}
-  .champbox{width:100%;text-align:center;background:var(--card);border:2px solid var(--accent);border-radius:0.8vw;padding:2.6vh 1vw;}
-  .champbox .lbl{font-size:0.95vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;display:block;margin-bottom:1vh;}
-  .champbox .nm{font-size:1.8vw;font-weight:800;}
+  /* Butterfly bracket (landscape) - responsive with connector lines */
+  .bfly{display:flex;align-items:stretch;justify-content:center;gap:0;flex:1 1 auto;
+    min-height:0;padding:1vh 1vw;font-size:clamp(9px,1.05vw,20px);}
+  .bcolb{display:flex;flex-direction:column;justify-content:center;flex:1 1 0;min-width:0;min-height:0;}
+  .bcolb .roundwrap{max-height:70%;}
+  .bcolb h3{font-size:0.85em;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);
+    font-weight:700;text-align:center;margin-bottom:0.6vh;flex:0 0 auto;}
+  .bcolb .roundwrap{display:flex;flex-direction:column;justify-content:space-around;flex:1 1 auto;min-height:0;gap:0.8vh;}
+  /* the tie pairs in a round */
+  .bfly .tie{font-size:0.95em;}
+  .bfly .tie .t{padding:0.9vh 0.7em;font-size:0.95em;}
+  /* connector lines via pseudo-elements */
+  .seg{position:relative;display:flex;flex-direction:column;justify-content:space-around;flex:1 1 auto;min-height:0;}
+  /* left side connectors point right */
+  .conn-l{position:relative;}
+  .conn-l::after{content:'';position:absolute;right:-0.9vw;top:50%;width:0.9vw;height:50%;
+    border:2px solid var(--line);border-left:none;border-radius:0 6px 6px 0;}
+  .conn-r{position:relative;}
+  .conn-r::after{content:'';position:absolute;left:-0.9vw;top:50%;width:0.9vw;height:50%;
+    border:2px solid var(--line);border-right:none;border-radius:6px 0 0 6px;}
+  .gap{flex:0 0 0.6vw;}
+  .bcentre{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6vh;flex:1.2 1 0;min-width:0;padding:0 0.6vw;}
+  .bcentre .fin{width:100%;}
+  .bcentre h3{font-size:0.85em;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:0.6vh;}
+  .champbox{width:100%;text-align:center;background:var(--card);border:2px solid var(--accent);
+    border-radius:0.7vw;padding:1.6vh 0.6vw;}
+  .champbox .lbl{font-size:0.8em;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);
+    font-weight:700;display:block;margin-bottom:0.6vh;}
+  .champbox .nm{font-size:1.5em;font-weight:800;line-height:1.1;}
   .champbox .nm.tbd{color:var(--ink3);font-weight:500;}
 
   .updated{position:fixed;bottom:1.4vh;right:1.6vw;font-size:0.85vw;color:var(--ink3);}
@@ -280,23 +299,26 @@
   function renderBracket(d){
     var b = d.bracket || {};
     var qf = b.quarterFinals || [], sf = b.semiFinals || [], f = b.final || null;
-    // split into two halves for the butterfly
     var qfL = [qf[0], qf[1]], qfR = [qf[2], qf[3]];
     var sfL = sf[0] || null, sfR = sf[1] || null;
     var champ = f && f.winner ? f.winner : '';
 
     var html = '<div class="bfly">';
-    // left quarter-finals
-    html += '<div class="bcolb side"><h3>Quarter-finals</h3>'+qfL.map(tie).join('')+'</div>';
-    // left semi
-    html += '<div class="bcolb"><h3>Semi-final</h3>'+tie(sfL)+'</div>';
+    // left quarter-finals (each tie gets a connector pointing right)
+    html += '<div class="bcolb"><h3>Quarter-finals</h3><div class="roundwrap">'
+          + qfL.map(function(t){return '<div class="conn-l">'+tie(t)+'</div>';}).join('')
+          + '</div></div>';
+    // left semi-final
+    html += '<div class="bcolb"><h3>Semi-final</h3><div class="roundwrap"><div class="conn-l">'+tie(sfL)+'</div></div></div>';
     // centre: final + champions
-    html += '<div class="bcentre"><div style="width:100%"><h3 style="font-size:0.95vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:0.8vh;">Final</h3>'+tie(f)+'</div>';
-    html += '<div class="champbox"><span class="lbl">Champions</span><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div></div>';
-    // right semi
-    html += '<div class="bcolb"><h3>Semi-final</h3>'+tie(sfR)+'</div>';
+    html += '<div class="bcentre"><div class="fin"><h3>Final</h3>'+tie(f)+'</div>'
+          + '<div class="champbox"><span class="lbl">Champions</span><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div></div>';
+    // right semi-final
+    html += '<div class="bcolb"><h3>Semi-final</h3><div class="roundwrap"><div class="conn-r">'+tie(sfR)+'</div></div></div>';
     // right quarter-finals
-    html += '<div class="bcolb side"><h3>Quarter-finals</h3>'+qfR.map(tie).join('')+'</div>';
+    html += '<div class="bcolb"><h3>Quarter-finals</h3><div class="roundwrap">'
+          + qfR.map(function(t){return '<div class="conn-r">'+tie(t)+'</div>';}).join('')
+          + '</div></div>';
     html += '</div>';
     main.innerHTML = html;
   }
@@ -321,11 +343,13 @@
     var phase = d.phase || 'group';
     var knockout = (phase==='quarter'||phase==='semi'||phase==='final'||phase==='knockout');
 
+    var portrait = window.innerHeight > window.innerWidth;
     if(screen==='totem'){
       if(knockout){ renderBracketVertical(d); }
       else { renderBoard(d); }
     } else {
-      if(knockout){ renderBracket(d); }
+      // pick bracket by actual orientation: wide = butterfly, tall = vertical pyramid
+      if(knockout){ portrait ? renderBracketVertical(d) : renderBracket(d); }
       else { renderCourts(d); }
     }
     if(d.updated){
