@@ -117,8 +117,8 @@
 
   /* ---- knockout bracket ---- */
   .bracket{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4vw;flex:1 1 auto;align-content:center;}
-  .vbracket{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;justify-content:space-evenly;
-    align-items:center;padding:2vh 3vw;font-size:clamp(13px,2.6vw,34px);box-sizing:border-box;}
+  .vbracket{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;justify-content:space-between;
+    align-items:center;padding:3vh 3vw;font-size:clamp(13px,2.6vw,34px);box-sizing:border-box;}
   .vround{display:flex;flex-direction:column;align-items:center;width:100%;}
   .vround h3{font-size:0.6em;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);
     font-weight:700;text-align:center;margin-bottom:0.8vh;}
@@ -133,6 +133,8 @@
   .champcard .nm{font-size:1.3em;font-weight:800;}
   .champcard .nm.tbd{color:var(--ink3);font-weight:500;}
   .vconn{width:3px;height:3.5vh;background:var(--accent);opacity:0.55;margin:0;}
+  .vfunnel{width:90%;max-width:90%;height:5vh;min-height:3vh;margin:0 auto;flex:0 1 auto;}
+  .vfunnel svg{width:100%;height:100%;display:block;}
   #fsbtn{position:fixed;top:1vh;right:1vw;z-index:50;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;}
   #fsbtn:hover{background:rgba(255,255,255,0.22);}
   :fullscreen #fsbtn, body:fullscreen #fsbtn{display:none;}
@@ -148,22 +150,25 @@
   .tie .t.tbd{color:var(--ink3);font-weight:500;}
 
   /* Butterfly bracket (landscape) */
-  .bfly{display:flex;align-items:center;justify-content:center;gap:0;flex:1 1 auto;
-    min-height:0;padding:2vh 1.5vw;font-size:clamp(9px,1.1vw,21px);}
+  .bfly{display:flex;align-items:center;justify-content:center;gap:2.5vw;flex:1 1 auto;
+    min-height:0;padding:2vh 2vw;font-size:clamp(9px,1.1vw,21px);}
   .bcolb{display:flex;flex-direction:column;justify-content:center;flex:1 1 0;min-width:0;min-height:0;}
   .bcolb h3{font-size:0.85em;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);
     font-weight:700;text-align:center;margin-bottom:1vh;flex:0 0 auto;}
   .bfly .tie{font-size:0.95em;width:100%;}
   .bfly .tie .t{padding:0.9vh 0.7em;font-size:0.95em;}
   /* QF pair with bracket connector */
-  .pair{position:relative;display:flex;flex-direction:column;gap:16vh;}
+  .pair{position:relative;display:flex;flex-direction:column;gap:26vh;}
   .single{position:relative;display:flex;flex-direction:column;justify-content:center;}
-  .brk{position:absolute;top:25%;bottom:25%;width:1.2vw;}
-  .brk-l{right:-1.2vw;border:2px solid var(--line);border-left:none;}
-  .brk-r{left:-1.2vw;border:2px solid var(--line);border-right:none;}
+  .brk{position:absolute;top:25%;bottom:25%;width:1.25vw;}
+  .brk-l{right:-1.25vw;border:2px solid var(--line);border-left:none;}
+  .brk-r{left:-1.25vw;border:2px solid var(--line);border-right:none;}
+  .brk-l::after{content:'';position:absolute;top:50%;right:-1.25vw;width:1.25vw;height:2px;background:var(--line);}
+  .brk-r::after{content:'';position:absolute;top:50%;left:-1.25vw;width:1.25vw;height:2px;background:var(--line);}
+  /* horizontal stub from a match into the column gap */
   .lead{position:absolute;top:50%;height:2px;background:var(--line);}
-  .lead-l{right:-1.5vw;width:1.5vw;}
-  .lead-r{left:-1.5vw;width:1.5vw;}
+  .lead-l{right:-2.5vw;width:2.5vw;}
+  .lead-r{left:-2.5vw;width:2.5vw;}
   /* centre column: champion floating box ABOVE the final, in the butterfly's void */
   .bcolb.centre{flex:1.25 1 0;justify-content:center;gap:0;position:relative;}
   .champfloat{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(50% + 7vh);width:100%;
@@ -331,18 +336,36 @@
     var b = d.bracket || {};
     var qf = b.quarterFinals || [], sf = b.semiFinals || [], f = b.final || null;
     var champ = f && f.winner ? f.winner : '';
-    var C = '<div class="vconn"></div>';
+
+    // straight connector (final -> champion)
+    var straight = '<div class="vconn"></div>';
+    // funnel connector: n boxes above converging to fewer below. cols = number of boxes in the WIDER (lower) round
+    function funnel(cols){
+      // draw `cols` lines converging toward `cols/2` points
+      var w = 100, h = 100, mid = w/2;
+      var lines = '';
+      var pairs = cols/2;
+      // positions of the wider round (bottom) box centres
+      for(var i=0;i<cols;i++){
+        var x = (w/(cols*2)) * (2*i+1);
+        // target: centre of the pair it belongs to (top)
+        var pair = Math.floor(i/2);
+        var tx = (w/(pairs*2)) * (2*pair+1);
+        lines += '<line x1="'+x+'" y1="100" x2="'+tx+'" y2="0" stroke="var(--accent)" stroke-width="1.2" opacity="0.5" vector-effect="non-scaling-stroke"/>';
+      }
+      return '<div class="vfunnel"><svg viewBox="0 0 100 100" preserveAspectRatio="none">'+lines+'</svg></div>';
+    }
 
     var html = '<div class="vbracket">';
     // Champions
     html += '<div class="vround"><h3>Champions</h3><div class="vrow one"><div class="champcard"><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div></div></div>';
-    html += C;
+    html += straight;
     // Final
     html += '<div class="vround"><h3>Final</h3><div class="vrow one">'+tie(f)+'</div></div>';
-    html += C;
+    html += funnel(2);
     // Semi-finals (2 across)
     html += '<div class="vround"><h3>Semi-finals</h3><div class="vrow">'+(sf[0]?tie(sf[0]):tie())+(sf[1]?tie(sf[1]):tie())+'</div></div>';
-    html += C;
+    html += funnel(4);
     // Quarter-finals (4 across)
     html += '<div class="vround"><h3>Quarter-finals</h3><div class="vrow">'+qf.map(tie).join('')+'</div></div>';
     html += '</div>';
