@@ -95,18 +95,20 @@
   .ltable tr:not(.qual) td{color:var(--ink2);}
   .ltable tr.qual td.team::after{content:" ●";color:var(--accent2);font-size:0.85vw;vertical-align:middle;margin-left:0.4vw;}
 
-  /* fixtures & results middle column */
-  .fxlist{display:flex;flex-direction:column;gap:0.7vh;flex:1 1 auto;min-height:0;overflow:hidden;}
-  .fx{background:var(--card);border:1px solid var(--line);border-radius:0.7vw;padding:0.8vh 1vw;
-    display:flex;flex-direction:column;gap:0.2vh;}
-  .fx.played{opacity:1;}
-  .fx.upcoming{opacity:0.72;}
-  .fx .fxteam{display:flex;justify-content:space-between;align-items:baseline;font-size:1.15vw;}
-  .fx .fxteam .nm{font-weight:600;}
+  /* fixtures & results middle column (auto-scrolling, time-grouped) */
+  .fxviewport{flex:1 1 auto;min-height:0;overflow:hidden;position:relative;}
+  .fxscroll{display:flex;flex-direction:column;gap:0.6vh;position:absolute;left:0;right:0;top:0;}
+  .fxhdr{font-size:0.85vw;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);
+    font-weight:700;padding:0.6vh 0 0.2vh;display:flex;align-items:center;gap:0.6vw;}
+  .fxhdr .gp{color:var(--ink3);font-weight:600;}
+  .fx{background:var(--card);border:1px solid var(--line);border-radius:0.6vw;padding:0.6vh 0.9vw;
+    display:flex;flex-direction:column;gap:0.1vh;}
+  .fx.upcoming{opacity:0.7;}
+  .fx .fxteam{display:flex;justify-content:space-between;align-items:baseline;font-size:1.0vw;}
+  .fx .fxteam .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
   .fx .fxteam.win .nm{color:var(--accent2);font-weight:800;}
-  .fx .fxteam .sc{font-weight:800;font-variant-numeric:tabular-nums;margin-left:1vw;}
-  .fx .fxmid{font-size:0.75vw;color:var(--ink3);text-align:center;font-weight:600;letter-spacing:0.05em;}
-  .fx.upcoming .fxmid{color:var(--accent);}
+  .fx .fxteam .sc{font-weight:800;font-variant-numeric:tabular-nums;margin-left:0.8vw;flex:0 0 auto;}
+  .fx .fxmid{font-size:0.62vw;color:var(--ink3);text-align:center;font-weight:600;letter-spacing:0.05em;}
 
   /* ---- TOTEM: leaderboard ---- */
   .totem main{padding:2vh 4vw 4vh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;}
@@ -292,22 +294,30 @@
     });
     html += '</div></div>';
 
-    // MIDDLE: fixtures & results
+    // MIDDLE: fixtures & results (grouped by time slot, auto-scrolling)
     var results = d.results || [];
-    html += '<div class="tvcol"><h2>Fixtures &amp; results</h2><div class="fxlist">';
+    html += '<div class="tvcol"><h2>Fixtures &amp; results</h2><div class="fxviewport"><div class="fxscroll" id="fxscroll">';
     if(results.length){
+      var lastKey = null;
+      var groupName = {A:'Group A', B:'Group B', SF:'Semi-finals', F:'Final'};
       results.forEach(function(m){
+        var key = (m.time||'') + '|' + (m.group||'');
+        if(key !== lastKey){
+          var gp = groupName[m.group] || (m.group||'');
+          html += '<div class="fxhdr">'+(m.time?esc(m.time):'')+(gp?' <span class="gp">'+esc(gp)+'</span>':'')+'</div>';
+          lastKey = key;
+        }
         var played = !!(m.winner);
         var wa = played && m.winner===m.teamA;
         var wb = played && m.winner===m.teamB;
         html += '<div class="fx '+(played?'played':'upcoming')+'">';
         html += '<div class="fxteam'+(wa?' win':'')+'"><span class="nm">'+esc(m.teamA||'TBC')+'</span>'+(played?'<span class="sc">'+esc(m.scoreA||'')+'</span>':'')+'</div>';
-        html += '<div class="fxmid">'+(played?'v':'v')+'</div>';
+        html += '<div class="fxmid">v</div>';
         html += '<div class="fxteam'+(wb?' win':'')+'"><span class="nm">'+esc(m.teamB||'TBC')+'</span>'+(played?'<span class="sc">'+esc(m.scoreB||'')+'</span>':'')+'</div>';
         html += '</div>';
       });
     }
-    html += '</div></div>';
+    html += '</div></div></div>';
 
     // RIGHT: full league table
     html += '<div class="tvcol"><h2>League table</h2>';
@@ -325,6 +335,29 @@
 
     html += '</div>';
     main.innerHTML = html;
+    startFixtureScroll();
+  }
+
+  var fxScrollTimer = null;
+  function startFixtureScroll(){
+    if(fxScrollTimer){ clearInterval(fxScrollTimer); fxScrollTimer = null; }
+    var vp = document.querySelector('.fxviewport');
+    var sc = document.getElementById('fxscroll');
+    if(!vp || !sc) return;
+    // wait a tick for layout
+    setTimeout(function(){
+      var overflow = sc.scrollHeight - vp.clientHeight;
+      if(overflow <= 4){ return; } // fits, no scroll needed
+      var pos = 0, dir = 1, paused = 0;
+      var step = 0.4; // px per tick
+      fxScrollTimer = setInterval(function(){
+        if(paused > 0){ paused--; return; }
+        pos += dir * step;
+        if(pos >= overflow){ pos = overflow; dir = -1; paused = 80; } // pause at bottom
+        else if(pos <= 0){ pos = 0; dir = 1; paused = 80; }           // pause at top
+        sc.style.transform = 'translateY(' + (-pos) + 'px)';
+      }, 30);
+    }, 100);
   }
 
   function renderBoard(d){
