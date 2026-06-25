@@ -95,6 +95,12 @@
   .ltable tr:not(.qual) td{color:var(--ink2);}
   .ltable tr.qual td.team::after{content:" ●";color:var(--accent2);font-size:0.85vw;vertical-align:middle;margin-left:0.4vw;}
 
+  /* stacked group tables */
+  .grouptables{display:flex;flex-direction:column;gap:1.4vh;flex:1 1 auto;min-height:0;}
+  .grouptable h3{font-size:1.0vw;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);
+    font-weight:700;margin-bottom:0.6vh;}
+  .grouptable table{width:100%;border-collapse:collapse;}
+
   /* fixtures & results middle column (auto-scrolling, time-grouped) */
   .fxviewport{flex:1 1 auto;min-height:0;overflow:hidden;position:relative;}
   .fxscroll{display:flex;flex-direction:column;gap:0.6vh;position:absolute;left:0;right:0;top:0;}
@@ -114,6 +120,9 @@
   /* ---- TOTEM: leaderboard ---- */
   .totem main{padding:2vh 4vw 4vh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;}
   .totem .board-wrap{flex:0 0 auto;}
+  .grouptables-totem{display:flex;flex-direction:column;gap:2.4vh;}
+  .grouptables-totem .grouptable h3{font-size:1.8vw;text-transform:uppercase;letter-spacing:0.1em;
+    color:var(--accent);font-weight:700;margin-bottom:1vh;}
   table.board{width:100%;border-collapse:collapse;}
   table.board th{font-size:1.4vw;text-transform:uppercase;letter-spacing:0.08em;
     color:var(--accent);font-weight:700;text-align:center;padding:0.8vh 0.4vw;}
@@ -320,11 +329,24 @@
     }
     html += '</div></div></div>';
 
-    // RIGHT: full league table
-    html += '<div class="tvcol"><h2>League table</h2>';
-    html += '<table class="ltable"><thead><tr><th class="pos">#</th><th class="team">Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th></tr></thead><tbody>';
+    // RIGHT: two stacked group tables
+    html += '<div class="tvcol"><h2>Group standings</h2><div class="grouptables">';
+    html += groupTable('Group A', d.standingsA || [], 2);
+    html += groupTable('Group B', d.standingsB || [], 2);
+    html += '</div></div>';
+
+    html += '</div>';
+    main.innerHTML = html;
+    startFixtureScroll();
+  }
+
+  // builds one group's standings table; topN qualify (green)
+  function groupTable(label, st, topN){
+    var h = '<div class="grouptable"><h3>'+esc(label)+'</h3>'
+      + '<table class="ltable"><thead><tr><th class="pos">#</th><th class="team">Team</th>'
+      + '<th>P</th><th>W</th><th>L</th><th>Pts</th></tr></thead><tbody>';
     st.forEach(function(s,i){
-      html += '<tr class="'+(i<qual?'qual':'')+'">'
+      h += '<tr class="'+(i<topN?'qual':'')+'">'
         + '<td class="pos">'+(i+1)+'</td>'
         + '<td class="team">'+esc(s.team)+'</td>'
         + '<td>'+esc(s.played)+'</td>'
@@ -332,11 +354,8 @@
         + '<td>'+esc(s.lost)+'</td>'
         + '<td class="pts">'+esc(s.points)+'</td></tr>';
     });
-    html += '</tbody></table></div>';
-
-    html += '</div>';
-    main.innerHTML = html;
-    startFixtureScroll();
+    h += '</tbody></table></div>';
+    return h;
   }
 
   var fxScrollTimer = null;
@@ -362,21 +381,27 @@
   }
 
   function renderBoard(d){
-    var st = d.standings || [];
-    var html = '<div class="board-wrap"><table class="board"><thead><tr>'
-      + '<th class="pos">#</th><th class="team">Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th>'
-      + '</tr></thead><tbody>';
-    var qual = Number(d.qualifiers) || 8;
-    st.forEach(function(s,i){
-      html += '<tr class="'+(i<qual?'qual':'')+'">'
-        + '<td class="pos">'+(i+1)+'</td>'
-        + '<td class="team">'+esc(s.team)+'</td>'
-        + '<td>'+esc(s.played)+'</td>'
-        + '<td>'+esc(s.won)+'</td>'
-        + '<td>'+esc(s.lost)+'</td>'
-        + '<td class="pts">'+esc(s.points)+'</td></tr>';
-    });
-    html += '</tbody></table></div>';
+    function gtable(label, st){
+      var h = '<div class="grouptable"><h3>'+esc(label)+'</h3>'
+        + '<table class="board"><thead><tr>'
+        + '<th class="pos">#</th><th class="team">Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th>'
+        + '</tr></thead><tbody>';
+      st.forEach(function(s,i){
+        h += '<tr class="'+(i<2?'qual':'')+'">'
+          + '<td class="pos">'+(i+1)+'</td>'
+          + '<td class="team">'+esc(s.team)+'</td>'
+          + '<td>'+esc(s.played)+'</td>'
+          + '<td>'+esc(s.won)+'</td>'
+          + '<td>'+esc(s.lost)+'</td>'
+          + '<td class="pts">'+esc(s.points)+'</td></tr>';
+      });
+      h += '</tbody></table></div>';
+      return h;
+    }
+    var html = '<div class="board-wrap"><div class="grouptables-totem">'
+      + gtable('Group A', d.standingsA || [])
+      + gtable('Group B', d.standingsB || [])
+      + '</div></div>';
 
     var live = (d.courts||[]).filter(function(c){return c.status==='live' || c.scoreA || c.scoreB;});
     if(live.length){
