@@ -118,18 +118,23 @@
   /* ---- knockout bracket ---- */
   .bracket{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4vw;flex:1 1 auto;align-content:center;}
   .vbracket{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;justify-content:center;
-    gap:0.4vh;padding:2vh 4vw;font-size:clamp(11px,2.2vw,30px);}
-  .vround{display:flex;flex-direction:column;align-items:center;}
+    align-items:center;gap:0.4vh;padding:2vh 4vw;font-size:clamp(11px,2.2vw,30px);box-sizing:border-box;}
+  .vround{display:flex;flex-direction:column;align-items:center;width:100%;}
   .vround h3{font-size:0.62em;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);
     font-weight:700;text-align:center;margin-bottom:0.5vh;}
-  .vties{display:flex;flex-direction:row;justify-content:center;gap:2vw;width:100%;}
-  .vties.single{flex-direction:column;}
-  .vbracket .tie{flex:1 1 0;min-width:0;}
-  .vbracket .tie .t{font-size:0.7em;padding:0.7vh 1vw;}
-  .vround.champ .tie{border:2px solid var(--accent);max-width:60%;border-radius:0.7vw;}
-  /* vertical connector spine between rounds */
-  .vconn{width:2px;height:3vh;background:var(--accent);opacity:0.5;align-self:center;flex:0 0 auto;margin:0.3vh 0;}
-  .vbridge{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
+  /* a row of ties; width capped and centered */
+  .vrow{display:flex;flex-direction:row;justify-content:center;gap:1.5vw;width:100%;max-width:90%;margin:0 auto;}
+  .vrow > .tie{flex:1 1 0;min-width:0;}
+  .vrow.one{max-width:55%;}
+  .vrow.champ > .champcard{flex:1 1 auto;}
+  .vbracket .tie .t{font-size:0.7em;padding:0.7vh 1vw;gap:0.6vw;}
+  .vbracket .tie .t > span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+  .vbracket .tie .t .s{flex:0 0 auto;}
+  .champcard{width:100%;text-align:center;background:var(--card);border:2px solid var(--accent);
+    border-radius:0.7vw;padding:1.6vh 1vw;}
+  .champcard .nm{font-size:0.95em;font-weight:800;}
+  .champcard .nm.tbd{color:var(--ink3);font-weight:500;}
+  .vconn{width:2px;height:2.6vh;background:var(--accent);opacity:0.5;margin:0.2vh 0;}
   #fsbtn{position:fixed;top:1vh;right:1vw;z-index:50;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;}
   #fsbtn:hover{background:rgba(255,255,255,0.22);}
   :fullscreen #fsbtn, body:fullscreen #fsbtn{display:none;}
@@ -335,21 +340,20 @@
     var b = d.bracket || {};
     var qf = b.quarterFinals || [], sf = b.semiFinals || [], f = b.final || null;
     var champ = f && f.winner ? f.winner : '';
-
-    function conn(){ return '<div class="vconn"></div>'; }
+    var C = '<div class="vconn"></div>';
 
     var html = '<div class="vbracket">';
-    // Champions at very top
-    html += '<div class="vround champ"><h3>Champions</h3><div class="tie"><div class="t '+(champ?'win':'tbd')+'" style="justify-content:center;font-size:0.95em;padding:1.4vh 1vw;">'+(champ?esc(champ):'TBC')+'</div></div></div>';
-    html += conn();
-    // Final (single)
-    html += '<div class="vround"><h3>Final</h3><div class="vties single" style="max-width:65%">'+tie(f)+'</div></div>';
-    html += conn();
-    // Semi-finals (two side by side)
-    html += '<div class="vround"><h3>Semi-finals</h3><div class="vties">'+(sf[0]?tie(sf[0]):tie())+(sf[1]?tie(sf[1]):tie())+'</div></div>';
-    html += conn();
-    // Quarter-finals (four across, two feeding each semi)
-    html += '<div class="vround"><h3>Quarter-finals</h3><div class="vties">'+qf.map(tie).join('')+'</div></div>';
+    // Champions
+    html += '<div class="vround"><h3>Champions</h3><div class="vrow one"><div class="champcard"><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div></div></div>';
+    html += C;
+    // Final
+    html += '<div class="vround"><h3>Final</h3><div class="vrow one">'+tie(f)+'</div></div>';
+    html += C;
+    // Semi-finals (2 across)
+    html += '<div class="vround"><h3>Semi-finals</h3><div class="vrow">'+(sf[0]?tie(sf[0]):tie())+(sf[1]?tie(sf[1]):tie())+'</div></div>';
+    html += C;
+    // Quarter-finals (4 across)
+    html += '<div class="vround"><h3>Quarter-finals</h3><div class="vrow">'+qf.map(tie).join('')+'</div></div>';
     html += '</div>';
     main.innerHTML = html;
   }
@@ -361,13 +365,11 @@
     var phase = d.phase || 'group';
     var knockout = (phase==='quarter'||phase==='semi'||phase==='final'||phase==='knockout');
 
-    var portrait = window.innerHeight > window.innerWidth;
     if(screen==='totem'){
       if(knockout){ renderBracketVertical(d); }
       else { renderBoard(d); }
     } else {
-      // pick bracket by actual orientation: wide = butterfly, tall = vertical pyramid
-      if(knockout){ portrait ? renderBracketVertical(d) : renderBracket(d); }
+      if(knockout){ renderBracket(d); }
       else { renderCourts(d); }
     }
     if(d.updated){
