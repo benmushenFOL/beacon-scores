@@ -117,24 +117,22 @@
 
   /* ---- knockout bracket ---- */
   .bracket{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4vw;flex:1 1 auto;align-content:center;}
-  .vbracket{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;justify-content:center;
-    align-items:center;gap:0.4vh;padding:2vh 4vw;font-size:clamp(11px,2.2vw,30px);box-sizing:border-box;}
+  .vbracket{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;justify-content:space-evenly;
+    align-items:center;padding:2vh 3vw;font-size:clamp(13px,2.6vw,34px);box-sizing:border-box;}
   .vround{display:flex;flex-direction:column;align-items:center;width:100%;}
-  .vround h3{font-size:0.62em;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);
-    font-weight:700;text-align:center;margin-bottom:0.5vh;}
-  /* a row of ties; width capped and centered */
-  .vrow{display:flex;flex-direction:row;justify-content:center;gap:1.5vw;width:100%;max-width:90%;margin:0 auto;}
+  .vround h3{font-size:0.6em;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);
+    font-weight:700;text-align:center;margin-bottom:0.8vh;}
+  .vrow{display:flex;flex-direction:row;justify-content:center;gap:1.4vw;width:100%;max-width:94%;margin:0 auto;}
   .vrow > .tie{flex:1 1 0;min-width:0;}
-  .vrow.one{max-width:55%;}
-  .vrow.champ > .champcard{flex:1 1 auto;}
-  .vbracket .tie .t{font-size:0.7em;padding:0.7vh 1vw;gap:0.6vw;}
-  .vbracket .tie .t > span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
-  .vbracket .tie .t .s{flex:0 0 auto;}
-  .champcard{width:100%;text-align:center;background:var(--card);border:2px solid var(--accent);
-    border-radius:0.7vw;padding:1.6vh 1vw;}
-  .champcard .nm{font-size:0.95em;font-weight:800;}
+  .vrow.one{max-width:70%;}
+  .vbracket .tie .t{font-size:0.78em;padding:1vh 0.9vw;gap:0.5vw;line-height:1.15;}
+  .vbracket .tie .t > span:first-child{min-width:0;word-break:break-word;}
+  .vbracket .tie .t .s{flex:0 0 auto;font-weight:800;}
+  .champcard{width:100%;text-align:center;background:var(--card);border:3px solid var(--accent);
+    border-radius:1vw;padding:2.6vh 1vw;box-shadow:0 0 24px rgba(255,43,191,0.25);}
+  .champcard .nm{font-size:1.3em;font-weight:800;}
   .champcard .nm.tbd{color:var(--ink3);font-weight:500;}
-  .vconn{width:2px;height:2.6vh;background:var(--accent);opacity:0.5;margin:0.2vh 0;}
+  .vconn{width:3px;height:3.5vh;background:var(--accent);opacity:0.55;margin:0;}
   #fsbtn{position:fixed;top:1vh;right:1vw;z-index:50;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;}
   #fsbtn:hover{background:rgba(255,255,255,0.22);}
   :fullscreen #fsbtn, body:fullscreen #fsbtn{display:none;}
@@ -149,36 +147,33 @@
   .tie .t .s{font-weight:800;font-variant-numeric:tabular-nums;}
   .tie .t.tbd{color:var(--ink3);font-weight:500;}
 
-  /* Butterfly bracket (landscape) - responsive with connector lines */
-  .bfly{display:flex;align-items:stretch;justify-content:center;gap:0;flex:1 1 auto;
-    min-height:0;padding:1vh 1vw;font-size:clamp(9px,1.05vw,20px);}
+  /* Butterfly bracket (landscape) */
+  .bfly{display:flex;align-items:center;justify-content:center;gap:0;flex:1 1 auto;
+    min-height:0;padding:2vh 1.5vw;font-size:clamp(9px,1.1vw,21px);}
   .bcolb{display:flex;flex-direction:column;justify-content:center;flex:1 1 0;min-width:0;min-height:0;}
-  .bcolb .roundwrap{max-height:70%;}
   .bcolb h3{font-size:0.85em;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);
-    font-weight:700;text-align:center;margin-bottom:0.6vh;flex:0 0 auto;}
-  .bcolb .roundwrap{display:flex;flex-direction:column;justify-content:space-around;flex:1 1 auto;min-height:0;gap:0.8vh;}
-  /* the tie pairs in a round */
-  .bfly .tie{font-size:0.95em;}
+    font-weight:700;text-align:center;margin-bottom:1vh;flex:0 0 auto;}
+  .bfly .tie{font-size:0.95em;width:100%;}
   .bfly .tie .t{padding:0.9vh 0.7em;font-size:0.95em;}
-  /* connector lines via pseudo-elements */
-  .seg{position:relative;display:flex;flex-direction:column;justify-content:space-around;flex:1 1 auto;min-height:0;}
-  /* left side connectors point right */
-  .conn-l{position:relative;}
-  .conn-l::after{content:'';position:absolute;right:-0.9vw;top:50%;width:0.9vw;height:50%;
-    border:2px solid var(--line);border-left:none;border-radius:0 6px 6px 0;}
-  .conn-r{position:relative;}
-  .conn-r::after{content:'';position:absolute;left:-0.9vw;top:50%;width:0.9vw;height:50%;
-    border:2px solid var(--line);border-right:none;border-radius:6px 0 0 6px;}
-  .gap{flex:0 0 0.6vw;}
-  .bcentre{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.6vh;flex:1.2 1 0;min-width:0;padding:0 0.6vw;}
-  .bcentre .fin{width:100%;}
-  .bcentre h3{font-size:0.85em;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:0.6vh;}
-  .champbox{width:100%;text-align:center;background:var(--card);border:2px solid var(--accent);
-    border-radius:0.7vw;padding:1.6vh 0.6vw;}
-  .champbox .lbl{font-size:0.8em;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);
+  /* QF pair with bracket connector */
+  .pair{position:relative;display:flex;flex-direction:column;gap:4vh;}
+  .single{position:relative;display:flex;flex-direction:column;justify-content:center;}
+  .brk{position:absolute;top:25%;bottom:25%;width:1.2vw;}
+  .brk-l{right:-1.2vw;border:2px solid var(--line);border-left:none;}
+  .brk-r{left:-1.2vw;border:2px solid var(--line);border-right:none;}
+  .lead{position:absolute;top:50%;height:2px;background:var(--line);}
+  .lead-l{right:-1.5vw;width:1.5vw;}
+  .lead-r{left:-1.5vw;width:1.5vw;}
+  /* centre column: champion floating box ABOVE the final, in the butterfly's void */
+  .bcolb.centre{flex:1.25 1 0;justify-content:center;gap:0;}
+  .champfloat{width:100%;text-align:center;background:var(--card);border:3px solid var(--accent);
+    border-radius:0.9vw;padding:2.2vh 1vw;margin-bottom:4vh;
+    box-shadow:0 0 30px rgba(255,43,191,0.32);}
+  .champfloat .lbl{font-size:0.85em;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);
     font-weight:700;display:block;margin-bottom:0.6vh;}
-  .champbox .nm{font-size:1.5em;font-weight:800;line-height:1.1;}
-  .champbox .nm.tbd{color:var(--ink3);font-weight:500;}
+  .champfloat .nm{font-size:1.8em;font-weight:800;line-height:1.1;}
+  .champfloat .nm.tbd{color:var(--ink3);font-weight:500;}
+  .bcolb.centre .single .tie{border-color:var(--accent);}
 
   .updated{position:fixed;bottom:1.4vh;right:1.6vw;font-size:0.85vw;color:var(--ink3);}
   .err{position:fixed;bottom:1.4vh;left:1.6vw;font-size:0.85vw;color:#ff8a8a;}
@@ -316,22 +311,18 @@
     var sfL = sf[0] || null, sfR = sf[1] || null;
     var champ = f && f.winner ? f.winner : '';
 
-    var html = '<div class="bfly">';
-    // left quarter-finals (each tie gets a connector pointing right)
-    html += '<div class="bcolb"><h3>Quarter-finals</h3><div class="roundwrap">'
-          + qfL.map(function(t){return '<div class="conn-l">'+tie(t)+'</div>';}).join('')
-          + '</div></div>';
-    // left semi-final
-    html += '<div class="bcolb"><h3>Semi-final</h3><div class="roundwrap"><div class="conn-l">'+tie(sfL)+'</div></div></div>';
-    // centre: final + champions
-    html += '<div class="bcentre"><div class="fin"><h3>Final</h3>'+tie(f)+'</div>'
-          + '<div class="champbox"><span class="lbl">Champions</span><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div></div>';
-    // right semi-final
-    html += '<div class="bcolb"><h3>Semi-final</h3><div class="roundwrap"><div class="conn-r">'+tie(sfR)+'</div></div></div>';
-    // right quarter-finals
-    html += '<div class="bcolb"><h3>Quarter-finals</h3><div class="roundwrap">'
-          + qfR.map(function(t){return '<div class="conn-r">'+tie(t)+'</div>';}).join('')
-          + '</div></div>';
+    var html = '';
+    // butterfly: QF | SF | (champion above final) | SF | QF
+    html += '<div class="bfly">';
+    html += '<div class="bcolb side"><h3>Quarter-finals</h3>'
+          + '<div class="pair">'+tie(qfL[0])+'<div class="brk brk-l"></div>'+tie(qfL[1])+'</div></div>';
+    html += '<div class="bcolb mid"><h3>Semi-final</h3><div class="single">'+tie(sfL)+'<div class="lead lead-l"></div></div></div>';
+    html += '<div class="bcolb centre">'
+          + '<div class="champfloat"><span class="lbl">Champions</span><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div>'
+          + '<h3>Final</h3><div class="single">'+tie(f)+'</div></div>';
+    html += '<div class="bcolb mid"><h3>Semi-final</h3><div class="single"><div class="lead lead-r"></div>'+tie(sfR)+'</div></div>';
+    html += '<div class="bcolb side"><h3>Quarter-finals</h3>'
+          + '<div class="pair">'+tie(qfR[0])+'<div class="brk brk-r"></div>'+tie(qfR[1])+'</div></div>';
     html += '</div>';
     main.innerHTML = html;
   }
