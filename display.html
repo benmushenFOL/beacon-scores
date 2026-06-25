@@ -128,6 +128,10 @@
   .vbracket .tie .t{font-size:0.78em;padding:1vh 0.9vw;gap:0.5vw;line-height:1.15;}
   .vbracket .tie .t > span:first-child{min-width:0;word-break:break-word;}
   .vbracket .tie .t .s{flex:0 0 auto;font-weight:800;}
+  /* narrow QF boxes: stack name over score so names never wrap mid-word */
+  .qfrow .tie .t{flex-direction:column;align-items:flex-start;gap:0.1vh;font-size:0.66em;padding:0.9vh 0.7vw;}
+  .qfrow .tie .t > span:first-child{white-space:normal;word-break:normal;line-height:1.1;}
+  .qfrow .tie .t .s{align-self:flex-start;}
   .champcard{width:100%;text-align:center;background:var(--card);border:3px solid var(--accent);
     border-radius:1vw;padding:2.6vh 1vw;box-shadow:0 0 24px rgba(255,43,191,0.25);}
   .champcard .nm{font-size:1.3em;font-weight:800;}
@@ -147,6 +151,8 @@
   .tie .t+.t{border-top:1px solid var(--line);}
   .tie .t.win{color:var(--accent2);font-weight:800;}
   .tie .t .s{font-weight:800;font-variant-numeric:tabular-nums;}
+  .tie .t .s .ov{font-weight:600;color:var(--ink2);font-size:0.85em;}
+  .tie .t .s .ytb{font-weight:500;color:var(--ink3);font-size:0.85em;font-style:italic;}
   .tie .t.tbd{color:var(--ink3);font-weight:500;}
 
   /* Butterfly bracket (landscape) */
@@ -299,14 +305,26 @@
     if(!t || (!t.teamA && !t.teamB)){
       return '<div class="tie"><div class="t tbd">TBC</div><div class="t tbd">TBC</div></div>';
     }
-    function row(name,score,win){
+    // build a score display: "98/2 (10)" or "98/2" or "yet to bat" depending on what's filled
+    function scoreText(score, overs, otherScore, started){
+      if(score){
+        return esc(score) + (overs ? ' <span class="ov">('+esc(overs)+')</span>' : '');
+      }
+      // no score yet for this side
+      if(started && otherScore){ return '<span class="ytb">yet to bat</span>'; }
+      return '';
+    }
+    var started = (t.status==='live' || t.status==='done' || t.scoreA || t.scoreB);
+    function row(name,scoreHtml,win){
       if(!name) name='TBC';
       var cls = win ? 't win' : (name==='TBC'?'t tbd':'t');
-      return '<div class="'+cls+'"><span>'+esc(name)+'</span><span class="s">'+esc(score||'')+'</span></div>';
+      return '<div class="'+cls+'"><span>'+esc(name)+'</span><span class="s">'+scoreHtml+'</span></div>';
     }
     var wa = t.winner && t.winner===t.teamA;
     var wb = t.winner && t.winner===t.teamB;
-    return '<div class="tie">'+row(t.teamA,t.scoreA,wa)+row(t.teamB,t.scoreB,wb)+'</div>';
+    var sa = scoreText(t.scoreA, t.oversA, t.scoreB, started);
+    var sb = scoreText(t.scoreB, t.oversB, t.scoreA, started);
+    return '<div class="tie">'+row(t.teamA,sa,wa)+row(t.teamB,sb,wb)+'</div>';
   }
 
   function renderBracket(d){
@@ -367,7 +385,7 @@
     html += '<div class="vround"><h3>Semi-finals</h3><div class="vrow">'+(sf[0]?tie(sf[0]):tie())+(sf[1]?tie(sf[1]):tie())+'</div></div>';
     html += funnel(4);
     // Quarter-finals (4 across)
-    html += '<div class="vround"><h3>Quarter-finals</h3><div class="vrow">'+qf.map(tie).join('')+'</div></div>';
+    html += '<div class="vround"><h3>Quarter-finals</h3><div class="vrow qfrow">'+qf.map(tie).join('')+'</div></div>';
     html += '</div>';
     main.innerHTML = html;
   }
