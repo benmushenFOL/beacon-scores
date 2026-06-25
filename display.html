@@ -58,10 +58,10 @@
   main{flex:1 1 auto;padding:2.4vh 2.4vw;overflow:hidden;display:flex;flex-direction:column;}
 
   /* ---- TV: three courts ---- */
-  .courts{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6vw;flex:1 1 auto;}
+  .courts{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6vw;flex:0 0 auto;}
   .court{
     background:var(--card);border:1px solid var(--line);border-radius:1.1vw;
-    padding:2.2vh 1.6vw;display:flex;flex-direction:column;
+    padding:2vh 1.6vw;display:flex;flex-direction:column;
   }
   .court .label{
     font-size:1.0vw;text-transform:uppercase;letter-spacing:0.14em;
@@ -77,23 +77,26 @@
   .vs{font-size:0.95vw;color:var(--ink3);text-align:center;padding:0.6vh 0;font-weight:600;}
 
   /* ---- standings strip on TV ---- */
-  .strip{flex:0 0 auto;margin-top:2.0vh;background:var(--bg2);border-radius:0.8vw;
-    border:1px solid var(--line);padding:1.4vh 1.4vw;overflow:hidden;}
-  .strip h2{font-size:0.95vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);
-    font-weight:700;margin-bottom:1.0vh;}
-  .strip-row{display:flex;gap:1.2vw;}
-  .chip{display:flex;align-items:center;gap:0.5vw;font-size:1.0vw;white-space:nowrap;}
-  .chip .pos{color:var(--ink3);font-weight:700;}
-  .chip .nm{font-weight:600;}
-  .chip .pt{color:var(--accent);font-weight:800;}
+  .strip{flex:1 1 auto;margin-top:2.0vh;background:var(--bg2);border-radius:0.8vw;
+    border:1px solid var(--line);padding:1.6vh 1.6vw;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
+  .strip h2{font-size:1.0vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);
+    font-weight:700;margin-bottom:1.4vh;flex:0 0 auto;}
+  .strip-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1vh 1.6vw;flex:1 1 auto;align-content:space-around;}
+  .chip{display:flex;align-items:center;gap:0.6vw;font-size:1.15vw;white-space:nowrap;}
+  .chip .pos{color:var(--ink3);font-weight:700;min-width:1.4vw;}
+  .chip.qual .pos{color:var(--accent2);}
+  .chip .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;}
+  .chip:not(.qual) .nm{color:var(--ink2);}
+  .chip .pt{color:var(--accent);font-weight:800;margin-left:auto;}
 
   /* ---- TOTEM: leaderboard ---- */
-  .totem main{padding:2vh 4vw;overflow:hidden;justify-content:space-between;}
+  .totem main{padding:2vh 4vw;overflow:hidden;display:flex;flex-direction:column;}
+  .totem .board-wrap{flex:0 0 auto;}
   table.board{width:100%;border-collapse:collapse;}
-  table.board th{font-size:1.6vw;text-transform:uppercase;letter-spacing:0.08em;
-    color:var(--accent);font-weight:700;text-align:center;padding:1.6vh 0.4vw;}
+  table.board th{font-size:1.4vw;text-transform:uppercase;letter-spacing:0.08em;
+    color:var(--accent);font-weight:700;text-align:center;padding:0.8vh 0.4vw;}
   table.board th.team{text-align:left;}
-  table.board td{font-size:2.0vw;font-weight:600;text-align:center;padding:1.25vh 0.4vw;
+  table.board td{font-size:1.7vw;font-weight:600;text-align:center;padding:0.75vh 0.4vw;
     border-top:1px solid var(--line);font-variant-numeric:tabular-nums;}
   table.board td.pos{color:var(--ink3);font-weight:800;width:8%;}
   table.board td.team{text-align:left;font-weight:700;}
@@ -104,14 +107,14 @@
   table.board tr:not(.qual) td{color:var(--ink2);}
   table.board tr.qual td.team::after{content:" ●";color:var(--accent2);font-size:1.0vw;vertical-align:middle;margin-left:0.4vw;}
 
-  .totem-live{margin-top:1.6vh;background:var(--card);border:1px solid var(--line);
-    border-radius:1.2vw;padding:2.0vh 1.6vw;}
-  .totem-live h2{font-size:1.5vw;text-transform:uppercase;letter-spacing:0.08em;
-    color:var(--ink3);font-weight:700;margin-bottom:1.6vh;}
-  .tl-row{display:flex;justify-content:space-between;align-items:center;padding:1.2vh 0;
-    border-bottom:1px solid var(--line);font-size:1.7vw;}
+  .totem-live{margin-top:auto;background:var(--card);border:1px solid var(--line);
+    border-radius:1.2vw;padding:2.4vh 2vw;flex:0 0 auto;}
+  .totem-live h2{font-size:1.7vw;text-transform:uppercase;letter-spacing:0.08em;
+    color:var(--accent);font-weight:700;margin-bottom:2vh;}
+  .tl-row{display:flex;justify-content:space-between;align-items:center;padding:1.6vh 0;
+    border-bottom:1px solid var(--line);font-size:2vw;}
   .tl-row:last-child{border-bottom:none;}
-  .tl-row .ct{color:var(--ink3);font-weight:700;font-size:1.2vw;width:18%;}
+  .tl-row .ct{color:var(--ink3);font-weight:700;font-size:1.4vw;width:18%;}
   .tl-row .mt{flex:1;font-weight:600;}
   .tl-row .sc{font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums;}
 
@@ -259,11 +262,13 @@
     });
     html += '</div>';
 
-    var st = (d.standings||[]).slice(0,8);
+    var st = (d.standings||[]);
+    var qual = Number(d.qualifiers) || 8;
     if(st.length){
-      html += '<div class="strip"><h2>Tournament standings</h2><div class="strip-row">';
+      html += '<div class="strip"><h2>Tournament standings</h2><div class="strip-grid">';
       st.forEach(function(s,i){
-        html += '<div class="chip"><span class="pos">'+(i+1)+'</span><span class="nm">'+esc(s.team)+'</span><span class="pt">'+esc(s.points)+'pt</span></div>';
+        var isQ = (i < qual);
+        html += '<div class="chip'+(isQ?' qual':'')+'"><span class="pos">'+(i+1)+'</span><span class="nm">'+esc(s.team)+'</span><span class="pt">'+esc(s.points)+'pt</span></div>';
       });
       html += '</div></div>';
     }
@@ -272,10 +277,10 @@
 
   function renderBoard(d){
     var st = d.standings || [];
-    var html = '<table class="board"><thead><tr>'
+    var html = '<div class="board-wrap"><table class="board"><thead><tr>'
       + '<th class="pos">#</th><th class="team">Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th>'
       + '</tr></thead><tbody>';
-    var qual = d.qualifiers || 8;
+    var qual = Number(d.qualifiers) || 8;
     st.forEach(function(s,i){
       html += '<tr class="'+(i<qual?'qual':'')+'">'
         + '<td class="pos">'+(i+1)+'</td>'
@@ -285,7 +290,7 @@
         + '<td>'+esc(s.lost)+'</td>'
         + '<td class="pts">'+esc(s.points)+'</td></tr>';
     });
-    html += '</tbody></table>';
+    html += '</tbody></table></div>';
 
     var live = (d.courts||[]).filter(function(c){return c.status==='live' || c.scoreA || c.scoreB;});
     if(live.length){
