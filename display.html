@@ -88,12 +88,12 @@
   .chip .pt{color:var(--accent);font-weight:800;}
 
   /* ---- TOTEM: leaderboard ---- */
-  .totem main{padding:2.4vh 4vw;}
+  .totem main{padding:2vh 4vw;overflow:hidden;justify-content:space-between;}
   table.board{width:100%;border-collapse:collapse;}
   table.board th{font-size:1.6vw;text-transform:uppercase;letter-spacing:0.08em;
     color:var(--accent);font-weight:700;text-align:center;padding:1.6vh 0.4vw;}
   table.board th.team{text-align:left;}
-  table.board td{font-size:2.0vw;font-weight:600;text-align:center;padding:1.5vh 0.4vw;
+  table.board td{font-size:2.0vw;font-weight:600;text-align:center;padding:1.25vh 0.4vw;
     border-top:1px solid var(--line);font-variant-numeric:tabular-nums;}
   table.board td.pos{color:var(--ink3);font-weight:800;width:8%;}
   table.board td.team{text-align:left;font-weight:700;}
@@ -104,7 +104,7 @@
   table.board tr:not(.qual) td{color:var(--ink2);}
   table.board tr.qual td.team::after{content:" ●";color:var(--accent2);font-size:1.0vw;vertical-align:middle;margin-left:0.4vw;}
 
-  .totem-live{margin-top:2.4vh;background:var(--card);border:1px solid var(--line);
+  .totem-live{margin-top:1.6vh;background:var(--card);border:1px solid var(--line);
     border-radius:1.2vw;padding:2.0vh 1.6vw;}
   .totem-live h2{font-size:1.5vw;text-transform:uppercase;letter-spacing:0.08em;
     color:var(--ink3);font-weight:700;margin-bottom:1.6vh;}
@@ -117,6 +117,14 @@
 
   /* ---- knockout bracket ---- */
   .bracket{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4vw;flex:1 1 auto;align-content:center;}
+  .vbracket{display:flex;flex-direction:column;gap:2.2vh;flex:1 1 auto;justify-content:center;padding:0 4vw;}
+  .vround h3{font-size:1.5vw;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:1.2vh;}
+  .vties{display:flex;flex-direction:column;gap:1.4vh;}
+  .vbracket .tie .t{font-size:1.7vw;padding:1.4vh 2vw;}
+  .vround.champ .tie{border:2px solid var(--accent);}
+  #fsbtn{position:fixed;top:1vh;right:1vw;z-index:50;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;}
+  #fsbtn:hover{background:rgba(255,255,255,0.22);}
+  :fullscreen #fsbtn, body:fullscreen #fsbtn{display:none;}
   .bcol{display:flex;flex-direction:column;justify-content:space-around;gap:1.4vh;}
   .bcol h3{font-size:1.0vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);
     font-weight:700;text-align:center;margin-bottom:1.0vh;}
@@ -128,12 +136,25 @@
   .tie .t .s{font-weight:800;font-variant-numeric:tabular-nums;}
   .tie .t.tbd{color:var(--ink3);font-weight:500;}
 
+  /* Butterfly bracket (landscape TV) */
+  .bfly{display:grid;grid-template-columns:1fr 1fr 1.3fr 1fr 1fr;gap:1.2vw;flex:1 1 auto;align-items:center;padding:0 1vw;}
+  .bcolb{display:flex;flex-direction:column;gap:2.2vh;}
+  .bcolb.side{justify-content:space-around;}
+  .bcolb h3{font-size:0.95vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:0.8vh;}
+  .bcentre{display:flex;flex-direction:column;align-items:center;gap:2.4vh;}
+  .bcentre .tie{width:100%;}
+  .champbox{width:100%;text-align:center;background:var(--card);border:2px solid var(--accent);border-radius:0.8vw;padding:2.6vh 1vw;}
+  .champbox .lbl{font-size:0.95vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;display:block;margin-bottom:1vh;}
+  .champbox .nm{font-size:1.8vw;font-weight:800;}
+  .champbox .nm.tbd{color:var(--ink3);font-weight:500;}
+
   .updated{position:fixed;bottom:1.4vh;right:1.6vw;font-size:0.85vw;color:var(--ink3);}
   .err{position:fixed;bottom:1.4vh;left:1.6vw;font-size:0.85vw;color:#ff8a8a;}
   .hidden{display:none!important;}
 </style>
 </head>
 <body>
+<button id="fsbtn" onclick="goFullscreen()">⛶ Fullscreen</button>
 <div class="wrap" id="root">
   <header>
     <div class="brand">
@@ -152,6 +173,11 @@
 
 <script>
 (function(){
+  window.goFullscreen = function(){
+    var el = document.documentElement;
+    if (el.requestFullscreen) el.requestFullscreen();
+    else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  };
   var params = new URLSearchParams(location.search);
   var screen = (params.get('screen') || 'tv').toLowerCase();
   var src = params.get('src') || 'https://beacon-scores.ben-mushen.workers.dev/';
@@ -254,12 +280,36 @@
   function renderBracket(d){
     var b = d.bracket || {};
     var qf = b.quarterFinals || [], sf = b.semiFinals || [], f = b.final || null;
-    var html = '<div class="bracket">';
-    html += '<div class="bcol"><h3>Quarter-finals</h3>'+qf.map(tie).join('')+'</div>';
-    html += '<div class="bcol"><h3>Semi-finals</h3>'+(sf.map(tie).join('')||tie()+tie())+'</div>';
-    html += '<div class="bcol"><h3>Final</h3>'+tie(f)+'</div>';
+    // split into two halves for the butterfly
+    var qfL = [qf[0], qf[1]], qfR = [qf[2], qf[3]];
+    var sfL = sf[0] || null, sfR = sf[1] || null;
     var champ = f && f.winner ? f.winner : '';
-    html += '<div class="bcol"><h3>Champions</h3><div class="tie"><div class="t '+(champ?'win':'tbd')+'" style="justify-content:center;font-size:1.5vw;padding:3vh 1vw;">'+(champ?esc(champ):'TBC')+'</div></div></div>';
+
+    var html = '<div class="bfly">';
+    // left quarter-finals
+    html += '<div class="bcolb side"><h3>Quarter-finals</h3>'+qfL.map(tie).join('')+'</div>';
+    // left semi
+    html += '<div class="bcolb"><h3>Semi-final</h3>'+tie(sfL)+'</div>';
+    // centre: final + champions
+    html += '<div class="bcentre"><div style="width:100%"><h3 style="font-size:0.95vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:0.8vh;">Final</h3>'+tie(f)+'</div>';
+    html += '<div class="champbox"><span class="lbl">Champions</span><span class="nm '+(champ?'':'tbd')+'">'+(champ?esc(champ):'TBC')+'</span></div></div>';
+    // right semi
+    html += '<div class="bcolb"><h3>Semi-final</h3>'+tie(sfR)+'</div>';
+    // right quarter-finals
+    html += '<div class="bcolb side"><h3>Quarter-finals</h3>'+qfR.map(tie).join('')+'</div>';
+    html += '</div>';
+    main.innerHTML = html;
+  }
+
+  function renderBracketVertical(d){
+    var b = d.bracket || {};
+    var qf = b.quarterFinals || [], sf = b.semiFinals || [], f = b.final || null;
+    var champ = f && f.winner ? f.winner : '';
+    var html = '<div class="vbracket">';
+    html += '<div class="vround champ"><h3>Champions</h3><div class="tie"><div class="t '+(champ?'win':'tbd')+'" style="justify-content:center;font-size:2.2vw;padding:2.2vh 1vw;">'+(champ?esc(champ):'TBC')+'</div></div></div>';
+    html += '<div class="vround"><h3>Final</h3><div class="vties">'+tie(f)+'</div></div>';
+    html += '<div class="vround"><h3>Semi-finals</h3><div class="vties">'+(sf.map(tie).join('')||tie()+tie())+'</div></div>';
+    html += '<div class="vround"><h3>Quarter-finals</h3><div class="vties">'+qf.map(tie).join('')+'</div></div>';
     html += '</div>';
     main.innerHTML = html;
   }
@@ -272,7 +322,7 @@
     var knockout = (phase==='quarter'||phase==='semi'||phase==='final'||phase==='knockout');
 
     if(screen==='totem'){
-      if(knockout){ renderBracket(d); }
+      if(knockout){ renderBracketVertical(d); }
       else { renderBoard(d); }
     } else {
       if(knockout){ renderBracket(d); }
