@@ -117,11 +117,19 @@
 
   /* ---- knockout bracket ---- */
   .bracket{display:grid;grid-template-columns:repeat(4,1fr);gap:1.4vw;flex:1 1 auto;align-content:center;}
-  .vbracket{display:flex;flex-direction:column;gap:2.2vh;flex:1 1 auto;justify-content:center;padding:0 4vw;}
-  .vround h3{font-size:1.5vw;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);font-weight:700;text-align:center;margin-bottom:1.2vh;}
-  .vties{display:flex;flex-direction:column;gap:1.4vh;}
-  .vbracket .tie .t{font-size:1.7vw;padding:1.4vh 2vw;}
-  .vround.champ .tie{border:2px solid var(--accent);}
+  .vbracket{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;justify-content:center;
+    gap:0.4vh;padding:2vh 4vw;font-size:clamp(11px,2.2vw,30px);}
+  .vround{display:flex;flex-direction:column;align-items:center;}
+  .vround h3{font-size:0.62em;text-transform:uppercase;letter-spacing:0.08em;color:var(--accent);
+    font-weight:700;text-align:center;margin-bottom:0.5vh;}
+  .vties{display:flex;flex-direction:row;justify-content:center;gap:2vw;width:100%;}
+  .vties.single{flex-direction:column;}
+  .vbracket .tie{flex:1 1 0;min-width:0;}
+  .vbracket .tie .t{font-size:0.7em;padding:0.7vh 1vw;}
+  .vround.champ .tie{border:2px solid var(--accent);max-width:60%;border-radius:0.7vw;}
+  /* vertical connector spine between rounds */
+  .vconn{width:2px;height:3vh;background:var(--accent);opacity:0.5;align-self:center;flex:0 0 auto;margin:0.3vh 0;}
+  .vbridge{display:flex;flex-direction:column;align-items:center;flex:0 0 auto;}
   #fsbtn{position:fixed;top:1vh;right:1vw;z-index:50;background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.25);border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;font-family:inherit;}
   #fsbtn:hover{background:rgba(255,255,255,0.22);}
   :fullscreen #fsbtn, body:fullscreen #fsbtn{display:none;}
@@ -327,10 +335,20 @@
     var b = d.bracket || {};
     var qf = b.quarterFinals || [], sf = b.semiFinals || [], f = b.final || null;
     var champ = f && f.winner ? f.winner : '';
+
+    function conn(){ return '<div class="vconn"></div>'; }
+
     var html = '<div class="vbracket">';
-    html += '<div class="vround champ"><h3>Champions</h3><div class="tie"><div class="t '+(champ?'win':'tbd')+'" style="justify-content:center;font-size:2.2vw;padding:2.2vh 1vw;">'+(champ?esc(champ):'TBC')+'</div></div></div>';
-    html += '<div class="vround"><h3>Final</h3><div class="vties">'+tie(f)+'</div></div>';
-    html += '<div class="vround"><h3>Semi-finals</h3><div class="vties">'+(sf.map(tie).join('')||tie()+tie())+'</div></div>';
+    // Champions at very top
+    html += '<div class="vround champ"><h3>Champions</h3><div class="tie"><div class="t '+(champ?'win':'tbd')+'" style="justify-content:center;font-size:0.95em;padding:1.4vh 1vw;">'+(champ?esc(champ):'TBC')+'</div></div></div>';
+    html += conn();
+    // Final (single)
+    html += '<div class="vround"><h3>Final</h3><div class="vties single" style="max-width:65%">'+tie(f)+'</div></div>';
+    html += conn();
+    // Semi-finals (two side by side)
+    html += '<div class="vround"><h3>Semi-finals</h3><div class="vties">'+(sf[0]?tie(sf[0]):tie())+(sf[1]?tie(sf[1]):tie())+'</div></div>';
+    html += conn();
+    // Quarter-finals (four across, two feeding each semi)
     html += '<div class="vround"><h3>Quarter-finals</h3><div class="vties">'+qf.map(tie).join('')+'</div></div>';
     html += '</div>';
     main.innerHTML = html;
