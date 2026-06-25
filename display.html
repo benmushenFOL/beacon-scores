@@ -57,40 +57,59 @@
 
   main{flex:1 1 auto;padding:2.4vh 2.4vw;overflow:hidden;display:flex;flex-direction:column;}
 
-  /* ---- TV: three courts ---- */
-  .courts{display:grid;grid-template-columns:repeat(3,1fr);gap:1.6vw;flex:0 0 auto;}
+  /* ---- TV: courts (left) + league table (right) ---- */
+  .tvsplit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.6vw;flex:1 1 auto;min-height:0;}
+  .tvcol{display:flex;flex-direction:column;min-height:0;}
+  .tvcol h2{font-size:1.1vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);
+    font-weight:700;margin-bottom:1.4vh;flex:0 0 auto;}
+
+  /* courts stacked vertically on the left */
+  .courts{display:flex;flex-direction:column;gap:1.4vh;flex:1 1 auto;min-height:0;}
   .court{
-    background:var(--card);border:1px solid var(--line);border-radius:1.1vw;
-    padding:2vh 1.6vw;display:flex;flex-direction:column;
+    background:var(--card);border:1px solid var(--line);border-radius:1vw;
+    padding:1.4vh 1.6vw;display:flex;flex-direction:column;justify-content:center;flex:1 1 0;min-height:0;
   }
   .court .label{
-    font-size:1.0vw;text-transform:uppercase;letter-spacing:0.14em;
-    color:var(--accent);font-weight:700;margin-bottom:2.2vh;
+    font-size:0.9vw;text-transform:uppercase;letter-spacing:0.14em;
+    color:var(--accent);font-weight:700;margin-bottom:0.8vh;
   }
-  .team-row{display:flex;align-items:baseline;justify-content:space-between;
-    padding:1.6vh 0;border-bottom:1px solid var(--line);}
-  .team-row:last-child{border-bottom:none;}
-  .team-row .name{font-size:1.7vw;font-weight:600;}
+  .team-row{display:flex;align-items:baseline;justify-content:space-between;padding:0.5vh 0;}
+  .team-row .name{font-size:1.5vw;font-weight:600;}
   .team-row.batting .name{color:var(--accent);}
-  .team-row .score{font-size:2.4vw;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
-  .team-row .overs{font-size:1.0vw;color:var(--ink2);font-weight:500;margin-left:0.5vw;}
-  .vs{font-size:0.95vw;color:var(--ink3);text-align:center;padding:0.6vh 0;font-weight:600;}
+  .team-row .score{font-size:2vw;font-weight:800;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;}
+  .team-row .overs{font-size:0.9vw;color:var(--ink2);font-weight:500;margin-left:0.4vw;}
+  .team-row .ytb{font-size:0.95vw;color:var(--ink3);font-style:italic;font-weight:500;}
+  .vs{font-size:0.85vw;color:var(--ink3);text-align:center;padding:0.3vh 0;font-weight:600;}
 
-  /* ---- standings strip on TV ---- */
-  .strip{flex:1 1 auto;margin-top:2.0vh;background:var(--bg2);border-radius:0.8vw;
-    border:1px solid var(--line);padding:1.6vh 1.6vw;overflow:hidden;display:flex;flex-direction:column;min-height:0;}
-  .strip h2{font-size:1.0vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);
-    font-weight:700;margin-bottom:1.4vh;flex:0 0 auto;}
-  .strip-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1vh 1.6vw;flex:1 1 auto;align-content:space-around;}
-  .chip{display:flex;align-items:center;gap:0.6vw;font-size:1.15vw;white-space:nowrap;}
-  .chip .pos{color:var(--ink3);font-weight:700;min-width:1.4vw;}
-  .chip.qual .pos{color:var(--accent2);}
-  .chip .nm{font-weight:600;overflow:hidden;text-overflow:ellipsis;}
-  .chip:not(.qual) .nm{color:var(--ink2);}
-  .chip .pt{color:var(--accent);font-weight:800;margin-left:auto;}
+  /* full league table on the right */
+  .ltable{width:100%;border-collapse:collapse;flex:1 1 auto;}
+  .ltable th{font-size:1.1vw;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent);
+    font-weight:700;text-align:center;padding:0.6vh 0.3vw;}
+  .ltable th.team{text-align:left;}
+  .ltable td{font-size:1.25vw;font-weight:600;text-align:center;padding:0.55vh 0.3vw;
+    border-top:1px solid var(--line);font-variant-numeric:tabular-nums;color:var(--ink);}
+  .ltable td.pos{color:var(--ink3);font-weight:800;width:7%;}
+  .ltable td.team{text-align:left;font-weight:700;}
+  .ltable td.pts{color:var(--accent);font-weight:800;}
+  .ltable tr.qual td.pos{color:var(--accent2);}
+  .ltable tr:not(.qual) td{color:var(--ink2);}
+  .ltable tr.qual td.team::after{content:" ●";color:var(--accent2);font-size:0.85vw;vertical-align:middle;margin-left:0.4vw;}
+
+  /* fixtures & results middle column */
+  .fxlist{display:flex;flex-direction:column;gap:0.7vh;flex:1 1 auto;min-height:0;overflow:hidden;}
+  .fx{background:var(--card);border:1px solid var(--line);border-radius:0.7vw;padding:0.8vh 1vw;
+    display:flex;flex-direction:column;gap:0.2vh;}
+  .fx.played{opacity:1;}
+  .fx.upcoming{opacity:0.72;}
+  .fx .fxteam{display:flex;justify-content:space-between;align-items:baseline;font-size:1.15vw;}
+  .fx .fxteam .nm{font-weight:600;}
+  .fx .fxteam.win .nm{color:var(--accent2);font-weight:800;}
+  .fx .fxteam .sc{font-weight:800;font-variant-numeric:tabular-nums;margin-left:1vw;}
+  .fx .fxmid{font-size:0.75vw;color:var(--ink3);text-align:center;font-weight:600;letter-spacing:0.05em;}
+  .fx.upcoming .fxmid{color:var(--accent);}
 
   /* ---- TOTEM: leaderboard ---- */
-  .totem main{padding:2vh 4vw;overflow:hidden;display:flex;flex-direction:column;}
+  .totem main{padding:2vh 4vw 4vh;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-start;}
   .totem .board-wrap{flex:0 0 auto;}
   table.board{width:100%;border-collapse:collapse;}
   table.board th{font-size:1.4vw;text-transform:uppercase;letter-spacing:0.08em;
@@ -107,7 +126,7 @@
   table.board tr:not(.qual) td{color:var(--ink2);}
   table.board tr.qual td.team::after{content:" ●";color:var(--accent2);font-size:1.0vw;vertical-align:middle;margin-left:0.4vw;}
 
-  .totem-live{margin-top:auto;background:var(--card);border:1px solid var(--line);
+  .totem-live{margin-top:4vh;background:var(--card);border:1px solid var(--line);
     border-radius:1.2vw;padding:2.4vh 2vw;flex:0 0 auto;}
   .totem-live h2{font-size:1.7vw;text-transform:uppercase;letter-spacing:0.08em;
     color:var(--accent);font-weight:700;margin-bottom:2vh;}
@@ -250,28 +269,61 @@
 
   function renderCourts(d){
     var courts = d.courts || [];
-    var html = '<div class="courts">';
+    var st = d.standings || [];
+    var qual = Number(d.qualifiers) || 8;
+
+    var html = '<div class="tvsplit">';
+
+    // LEFT: courts stacked
+    html += '<div class="tvcol"><h2>Live on court</h2><div class="courts">';
     courts.forEach(function(c){
-      var aBat = c.scoreA && (!c.scoreB || (c.status!=='2nd'));
+      var aStarted = (c.status==='live'||c.status==='done'||c.scoreA||c.scoreB);
+      function scoreCell(score,overs,started){
+        if(score){ return '<span class="score">'+esc(score)+'</span>'+(overs?'<span class="overs">('+esc(overs)+')</span>':''); }
+        if(started){ return '<span class="ytb">yet to bat</span>'; }
+        return '';
+      }
       html += '<div class="court">';
       html += '<div class="label">Court '+esc(c.court)+'</div>';
-      html += '<div class="team-row '+(c.scoreA && !c.scoreB?'batting':'')+'"><span class="name">'+esc(c.teamA||'TBC')+'</span><span class="score">'+fmtScore(c.scoreA,c.oversA)+'</span></div>';
+      html += '<div class="team-row '+(c.scoreA&&!c.scoreB?'batting':'')+'"><span class="name">'+esc(c.teamA||'TBC')+'</span><span>'+scoreCell(c.scoreA,c.oversA,aStarted)+'</span></div>';
       html += '<div class="vs">v</div>';
-      html += '<div class="team-row '+(c.scoreB?'batting':'')+'"><span class="name">'+esc(c.teamB||'TBC')+'</span><span class="score">'+fmtScore(c.scoreB,c.oversB)+'</span></div>';
+      html += '<div class="team-row '+(c.scoreB?'batting':'')+'"><span class="name">'+esc(c.teamB||'TBC')+'</span><span>'+scoreCell(c.scoreB,c.oversB,aStarted)+'</span></div>';
       html += '</div>';
     });
-    html += '</div>';
+    html += '</div></div>';
 
-    var st = (d.standings||[]);
-    var qual = Number(d.qualifiers) || 8;
-    if(st.length){
-      html += '<div class="strip"><h2>Tournament standings</h2><div class="strip-grid">';
-      st.forEach(function(s,i){
-        var isQ = (i < qual);
-        html += '<div class="chip'+(isQ?' qual':'')+'"><span class="pos">'+(i+1)+'</span><span class="nm">'+esc(s.team)+'</span><span class="pt">'+esc(s.points)+'pt</span></div>';
+    // MIDDLE: fixtures & results
+    var results = d.results || [];
+    html += '<div class="tvcol"><h2>Fixtures &amp; results</h2><div class="fxlist">';
+    if(results.length){
+      results.forEach(function(m){
+        var played = !!(m.winner);
+        var wa = played && m.winner===m.teamA;
+        var wb = played && m.winner===m.teamB;
+        html += '<div class="fx '+(played?'played':'upcoming')+'">';
+        html += '<div class="fxteam'+(wa?' win':'')+'"><span class="nm">'+esc(m.teamA||'TBC')+'</span>'+(played?'<span class="sc">'+esc(m.scoreA||'')+'</span>':'')+'</div>';
+        html += '<div class="fxmid">'+(played?'v':'v')+'</div>';
+        html += '<div class="fxteam'+(wb?' win':'')+'"><span class="nm">'+esc(m.teamB||'TBC')+'</span>'+(played?'<span class="sc">'+esc(m.scoreB||'')+'</span>':'')+'</div>';
+        html += '</div>';
       });
-      html += '</div></div>';
     }
+    html += '</div></div>';
+
+    // RIGHT: full league table
+    html += '<div class="tvcol"><h2>League table</h2>';
+    html += '<table class="ltable"><thead><tr><th class="pos">#</th><th class="team">Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th></tr></thead><tbody>';
+    st.forEach(function(s,i){
+      html += '<tr class="'+(i<qual?'qual':'')+'">'
+        + '<td class="pos">'+(i+1)+'</td>'
+        + '<td class="team">'+esc(s.team)+'</td>'
+        + '<td>'+esc(s.played)+'</td>'
+        + '<td>'+esc(s.won)+'</td>'
+        + '<td>'+esc(s.lost)+'</td>'
+        + '<td class="pts">'+esc(s.points)+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+
+    html += '</div>';
     main.innerHTML = html;
   }
 
