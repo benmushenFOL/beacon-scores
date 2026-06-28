@@ -59,6 +59,7 @@
 
   /* ---- TV: courts (left) + league table (right) ---- */
   .tvsplit{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.6vw;flex:1 1 auto;min-height:0;}
+  .tvsplit.nolive{grid-template-columns:1.2fr 1fr;}
   .tvcol{display:flex;flex-direction:column;min-height:0;}
   .tvcol h2{font-size:1.1vw;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent);
     font-weight:700;margin-bottom:1.4vh;flex:0 0 auto;}
@@ -283,10 +284,12 @@
     var courts = d.courts || [];
     var st = d.standings || [];
     var qual = Number(d.qualifiers) || 8;
+    var showLive = (String(d.showLive).toLowerCase()==='on' || String(d.showLive).toLowerCase()==='true' || String(d.showLive)==='1');
 
-    var html = '<div class="tvsplit">';
+    var html = '<div class="tvsplit'+(showLive?'':' nolive')+'">';
 
-    // LEFT: courts stacked
+    // LEFT: courts stacked (only when live scoring is on)
+    if(showLive){
     html += '<div class="tvcol"><h2>Live on court</h2><div class="courts">';
     courts.forEach(function(c){
       var aStarted = (c.status==='live'||c.status==='done'||c.scoreA||c.scoreB);
@@ -303,6 +306,7 @@
       html += '</div>';
     });
     html += '</div></div>';
+    } // end showLive courts column
 
     // MIDDLE: fixtures & results (grouped by time slot, auto-scrolling)
     var results = d.results || [];
@@ -406,8 +410,9 @@
       + gtable('Group B', d.standingsB || [])
       + '</div></div>';
 
+    var showLive = (String(d.showLive).toLowerCase()==='on' || String(d.showLive).toLowerCase()==='true' || String(d.showLive)==='1');
     var live = (d.courts||[]).filter(function(c){return c.status==='live' || c.scoreA || c.scoreB;});
-    if(live.length){
+    if(showLive && live.length){
       html += '<div class="totem-live"><h2>Live now</h2>';
       live.forEach(function(c){
         var sa = c.scoreA||'–', sb = c.scoreB||'–';
@@ -552,7 +557,11 @@
   }
 
   function fetchData(){
-    fetch(src + (src.indexOf('?')>-1?'&':'?') + '_t=' + Date.now(), {cache:'no-store'})
+    var bust = '_t=' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    fetch(src + (src.indexOf('?')>-1?'&':'?') + bust, {
+        cache: 'no-store',
+        headers: { 'Cache-Control': 'no-cache, no-store, max-age=0', 'Pragma': 'no-cache' }
+      })
       .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
       .then(function(d){ lastData = d; errEl.classList.add('hidden'); render(); })
       .catch(function(e){
