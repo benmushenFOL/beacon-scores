@@ -331,8 +331,10 @@
 
     // RIGHT: two stacked group tables
     html += '<div class="tvcol"><h2>Group standings</h2><div class="grouptables">';
-    html += groupTable('Group A', d.standingsA || [], 2);
-    html += groupTable('Group B', d.standingsB || [], 2);
+    // green highlight per group = qualifiers split across the two groups
+    var perGroup = Math.max(1, Math.floor((Number(d.qualifiers) || 4) / 2));
+    html += groupTable('Group A', d.standingsA || [], perGroup);
+    html += groupTable('Group B', d.standingsB || [], perGroup);
     html += '</div></div>';
 
     html += '</div>';
@@ -381,13 +383,14 @@
   }
 
   function renderBoard(d){
+    var perGroup = Math.max(1, Math.floor((Number(d.qualifiers) || 4) / 2));
     function gtable(label, st){
       var h = '<div class="grouptable"><h3>'+esc(label)+'</h3>'
         + '<table class="board"><thead><tr>'
         + '<th class="pos">#</th><th class="team">Team</th><th>P</th><th>W</th><th>L</th><th>Pts</th>'
         + '</tr></thead><tbody>';
       st.forEach(function(s,i){
-        h += '<tr class="'+(i<2?'qual':'')+'">'
+        h += '<tr class="'+(i<perGroup?'qual':'')+'">'
           + '<td class="pos">'+(i+1)+'</td>'
           + '<td class="team">'+esc(s.team)+'</td>'
           + '<td>'+esc(s.played)+'</td>'
