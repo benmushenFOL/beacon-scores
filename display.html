@@ -284,7 +284,7 @@
     var courts = d.courts || [];
     var st = d.standings || [];
     var qual = Number(d.qualifiers) || 8;
-    var showLive = (String(d.showLive).toLowerCase()==='on' || String(d.showLive).toLowerCase()==='true' || String(d.showLive)==='1');
+    var showLive = !(String(d.showLive).toLowerCase()==='off' || String(d.showLive).toLowerCase()==='false' || String(d.showLive)==='0');
 
     var html = '<div class="tvsplit'+(showLive?'':' nolive')+'">';
 
@@ -410,7 +410,7 @@
       + gtable('Group B', d.standingsB || [])
       + '</div></div>';
 
-    var showLive = (String(d.showLive).toLowerCase()==='on' || String(d.showLive).toLowerCase()==='true' || String(d.showLive)==='1');
+    var showLive = !(String(d.showLive).toLowerCase()==='off' || String(d.showLive).toLowerCase()==='false' || String(d.showLive)==='0');
     var live = (d.courts||[]).filter(function(c){return c.status==='live' || c.scoreA || c.scoreB;});
     if(showLive && live.length){
       html += '<div class="totem-live"><h2>Live now</h2>';
